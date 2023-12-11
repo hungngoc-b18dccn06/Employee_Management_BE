@@ -1,5 +1,6 @@
-package employee.example.EmployeeProjetc.Entity;
+package employee.example.EmployeeProjetc.DTO;
 
+import employee.example.EmployeeProjetc.Entity.Employee;
 import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
