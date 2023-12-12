@@ -41,7 +41,6 @@ public class EmployeeServiceImpl implements EmployeeService{
         if (employeeRepository.existsById(Integer.valueOf(employee.getEmployeeid()))) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Employee with this ID already exists");
         }
-
         if (!isValidEmail(employee.getEmail())) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid email format");
         }
@@ -49,7 +48,6 @@ public class EmployeeServiceImpl implements EmployeeService{
         if (existingEmployee != null) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Email already exists");
         }
-
         Employee newEmployee = new Employee(
                 employee.getId(),
                 employee.getEmployeeid(),
@@ -62,7 +60,6 @@ public class EmployeeServiceImpl implements EmployeeService{
         employeeRepository.save(newEmployee);
         return ResponseEntity.ok().body( globalExceptionHandler.buildSuccessResponse("Employee registered successfully: " + newEmployee.getEmployeename()).getBody());
     }
-
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
     private boolean isValidEmail(String email) {
@@ -72,12 +69,10 @@ public class EmployeeServiceImpl implements EmployeeService{
         Matcher matcher = EMAIL_PATTERN.matcher(email);
         return matcher.matches();
     }
-
     @Override
     public Page<Employee> getAllEmployees(Pageable pageable) {
         return employeeRepository.findAll(pageable);
     }
-
     @Override
     public Page<Employee> searchEmployees(Pageable pageable, Integer role, String searchText) {
         List<Integer> roles = new ArrayList<>();
@@ -98,7 +93,6 @@ public class EmployeeServiceImpl implements EmployeeService{
         if (foundEmployee != null && passwordEncoder.matches(employee.getPassword(), foundEmployee.getPassword())) {
             Date now = new Date();
             Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-
             String token =  Jwts.builder()
                     .setSubject(foundEmployee.getEmail())
                     .setIssuedAt(now)
@@ -123,10 +117,8 @@ public class EmployeeServiceImpl implements EmployeeService{
         }
         employee.setId(id);
         employeeRepository.save(employee);
-
         return ResponseEntity.ok("Employee updated successfully");
     }
-
     @Override
     public ResponseEntity<Employee> getEmployeeDetail(int id) {
         if (!employeeRepository.existsById(id)) {
@@ -135,8 +127,6 @@ public class EmployeeServiceImpl implements EmployeeService{
         Employee employee = employeeRepository.findById(id).orElse(null);
         return ResponseEntity.ok(employee);
     }
-
-
     @Override
     public ResponseEntity<EmployeeDTO> getCurrentEmployee(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
@@ -149,10 +139,8 @@ public class EmployeeServiceImpl implements EmployeeService{
                         .build()
                         .parseClaimsJws(jwtToken)
                         .getBody();
-
                 String email = claims.getSubject();
                 Employee employee = employeeRepository.findByEmail(email);
-
                 if (employee != null) {
                     EmployeeDTO result = new EmployeeDTO(employee);
                     return ResponseEntity.ok(result);
