@@ -1,7 +1,7 @@
 package employee.example.EmployeeProjetc.Repository;
 
 import employee.example.EmployeeProjetc.Entity.Employee;
-import employee.example.EmployeeProjetc.Entity.EmployeeDTO;
+import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

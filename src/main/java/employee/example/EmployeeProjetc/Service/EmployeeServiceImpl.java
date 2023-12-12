@@ -1,7 +1,7 @@
 package employee.example.EmployeeProjetc.Service;
 
 import employee.example.EmployeeProjetc.Entity.Employee;
-import employee.example.EmployeeProjetc.Entity.EmployeeDTO;
+import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
 import employee.example.EmployeeProjetc.Entity.GlobalExceptionHandler;
 import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
 import io.jsonwebtoken.Jwts;
@@ -30,11 +30,8 @@ public class EmployeeServiceImpl implements EmployeeService{
         this.employeeRepository = employeeRepository;
         this.globalExceptionHandler = globalExceptionHandler;
     }
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-
     @Override
     public ResponseEntity<Map<String, Object>> registerEmployee(Employee employee) {
         if (employeeRepository.existsById(employee.getEmployeeid())) {
@@ -44,8 +41,6 @@ public class EmployeeServiceImpl implements EmployeeService{
         if (!isValidEmail(employee.getEmail())) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid email format");
         }
-
-        // Check if the email already exists in the database
         Employee existingEmployee = employeeRepository.findByEmail(employee.getEmail());
         if (existingEmployee != null) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Email already exists");
@@ -117,4 +112,33 @@ public class EmployeeServiceImpl implements EmployeeService{
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
+    @Override
+    public ResponseEntity<String> updateEmployee(int id, Employee employee) {
+        if (!employeeRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
+        employee.setId(id);
+        employeeRepository.save(employee);
+
+        return ResponseEntity.ok("Employee updated successfully");
+    }
+
+    @Override
+    public ResponseEntity<Employee> getEmployeeDetail(int id) {
+        if (!employeeRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        Employee employee = employeeRepository.findById(id).orElse(null);
+        return ResponseEntity.ok(employee);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteEmployee(int id) {
+        if (!employeeRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
+        employeeRepository.deleteById(id);
+
+        return ResponseEntity.ok("Employee deleted successfully");
+    }
 }
