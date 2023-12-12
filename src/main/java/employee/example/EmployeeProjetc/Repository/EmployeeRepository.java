@@ -1,7 +1,6 @@
 package employee.example.EmployeeProjetc.Repository;
 
 import employee.example.EmployeeProjetc.Entity.Employee;
-import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,8 +16,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     Optional<Employee> findOneByEmailAndPassword(String email, String password);
     Employee findByEmail(String email);
 
-    @Query(value = "select new employee.example.EmployeeProjetc.Entity.EmployeeDTO(e) from Employee e " +
-            "where e.role in ?1 and (e.employeename like %?2% or e.email like %?2% or e.phone like %?2% or CAST(e.role AS string) like %?2%)")
+    @Query("SELECT e FROM Employee e WHERE e.role IN ?1 AND (e.employeeid LIKE %?2%  OR e.employeename LIKE %?2% OR e.email LIKE %?2% OR e.phone LIKE %?2%)")
+    Page<Employee> findByRoleAndEmployeenameContaining(List<Integer> roles, String search, Pageable pageable);
 
-    Page<EmployeeDTO> findByRoleAndEmployeenameContaining(List<Integer> roles, String employeename, Pageable pageable);
 }

@@ -12,7 +12,7 @@ public class Employee {
     private int id;
 
     @Column(name="employee_id", length = 255)
-    private int employeeid;
+    private String employeeid;
     @Column(name="employee_name", length = 255)
     private String employeename;
     @Column(name="email", length = 255)
@@ -24,7 +24,7 @@ public class Employee {
     @Column(name = "role")
     private int role;
 
-    public Employee(int id,int employeeid, String employeename, String email, String phone, String password, int role) {
+    public Employee(int id, String employeeid, String employeename, String email, String phone, String password, int role) {
         this.id = id;
         this.employeeid = employeeid;
         this.employeename = employeename;
@@ -38,11 +38,11 @@ public class Employee {
 
     }
 
-    public int getEmployeeid() {
+    public String getEmployeeid() {
         return employeeid;
     }
 
-    public void setEmployeeid(int employeeid) {
+    public void setEmployeeid(String employeeid) {
         this.employeeid = employeeid;
     }
 

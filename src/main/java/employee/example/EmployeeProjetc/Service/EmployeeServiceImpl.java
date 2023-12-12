@@ -1,13 +1,15 @@
 package employee.example.EmployeeProjetc.Service;
 
-import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
+import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.Entity.GlobalExceptionHandler;
 import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,10 +33,12 @@ public class EmployeeServiceImpl implements EmployeeService{
         this.globalExceptionHandler = globalExceptionHandler;
     }
     @Autowired
+    private HttpServletRequest httpServletRequest;
+    @Autowired
     private PasswordEncoder passwordEncoder;
     @Override
     public ResponseEntity<Map<String, Object>> registerEmployee(Employee employee) {
-        if (employeeRepository.existsById(employee.getEmployeeid())) {
+        if (employeeRepository.existsById(Integer.valueOf(employee.getEmployeeid()))) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Employee with this ID already exists");
         }
 
@@ -75,7 +79,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     @Override
-    public Page<EmployeeDTO> searchEmployees(Pageable pageable, Integer role, String searchText) {
+    public Page<Employee> searchEmployees(Pageable pageable, Integer role, String searchText) {
         List<Integer> roles = new ArrayList<>();
         if (role == null){
             roles.add(1);
@@ -131,6 +135,35 @@ public class EmployeeServiceImpl implements EmployeeService{
         Employee employee = employeeRepository.findById(id).orElse(null);
         return ResponseEntity.ok(employee);
     }
+
+
+    @Override
+    public ResponseEntity<EmployeeDTO> getCurrentEmployee(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                String jwtToken = authorizationHeader.substring(7);
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(getSignInKey(JWT_SECRET))
+                        .build()
+                        .parseClaimsJws(jwtToken)
+                        .getBody();
+
+                String email = claims.getSubject();
+                Employee employee = employeeRepository.findByEmail(email);
+
+                if (employee != null) {
+                    EmployeeDTO result = new EmployeeDTO(employee);
+                    return ResponseEntity.ok(result);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
 
     @Override
     public ResponseEntity<String> deleteEmployee(int id) {

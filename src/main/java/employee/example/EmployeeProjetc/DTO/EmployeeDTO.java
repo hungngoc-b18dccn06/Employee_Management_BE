@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class EmployeeDTO {
-    private int employeeid;
+    private String employeeid;
     private String employeename;
     private String email;
     private String phone;
     private int role;
 
-    public EmployeeDTO(int employeeid, String employeename, String email, String phone, int role) {
+    public EmployeeDTO(String employeeid, String employeename, String email, String phone, int role) {
         this.employeeid = employeeid;
         this.employeename = employeename;
         this.email = email;
@@ -24,7 +24,7 @@ public class EmployeeDTO {
         this.role = role;
     }
     public EmployeeDTO(Employee employee) {
-        this.employeeid = employee.getEmployeeid();
+        this.employeeid = String.valueOf(employee.getEmployeeid());
         this.email = employee.getEmail();
         this.employeename = employee.getEmployeename();
         this.phone = employee.getPhone();
