@@ -1,7 +1,8 @@
 package employee.example.EmployeeProjetc.Service;
 
-import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
+import employee.example.EmployeeProjetc.Entity.Employee;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ public interface EmployeeService {
     public ResponseEntity<Map<String, Object>> registerEmployee(Employee employee);
     Page<Employee> getAllEmployees(Pageable pageable);
 
-    Page<EmployeeDTO> searchEmployees(Pageable pageable, Integer roleType, String searchText);
+    Page<Employee> searchEmployees(Pageable pageable, Integer roleType, String searchText);
 
     ResponseEntity<String> loginEmployee(Employee employee);
 
@@ -22,5 +23,7 @@ public interface EmployeeService {
     public ResponseEntity<Employee> getEmployeeDetail(int id);
 
     public ResponseEntity<String> deleteEmployee(int id);
+
+    public ResponseEntity<EmployeeDTO> getCurrentEmployee(HttpServletRequest request);
 
 }
