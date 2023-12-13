@@ -2,6 +2,8 @@ package employee.example.EmployeeProjetc.EmployeeController;
 
 
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
+import employee.example.EmployeeProjetc.DTO.FilterValue;
+import employee.example.EmployeeProjetc.DTO.RegisterEmployeeRequest;
 import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.Service.EmployeeService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @RestController
@@ -23,7 +27,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
     @PostMapping(path = "/register")
-    public ResponseEntity<String> saveEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<String> registerEmployee(@RequestBody RegisterEmployeeRequest employee) throws ParseException {
         ResponseEntity<Map<String, Object>> responseEntity = employeeService.registerEmployee(employee);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -39,6 +43,14 @@ public class EmployeeController {
                                           @RequestParam(name = "role_type", defaultValue = "") Integer role,
                                           @RequestParam(name = "search_text", defaultValue = "") String searchText) {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
+        return employeeService.searchEmployees(pageRequest, role, searchText);
+    }
+
+    @PostMapping(path = "/search")
+    public Page<Employee> searchAllEmployees(@RequestBody FilterValue filterValue) {
+        PageRequest pageRequest = PageRequest.of(filterValue.getPageIndex(), filterValue.getPageSize());
+        Integer role = (Integer) filterValue.getFilterValue().get("role");
+        String searchText = (String) filterValue.getFilterValue().get("search_text");
         return employeeService.searchEmployees(pageRequest, role, searchText);
     }
 

@@ -2,6 +2,7 @@ package employee.example.EmployeeProjetc.DTO;
 
 import employee.example.EmployeeProjetc.Entity.Employee;
 import jakarta.persistence.Column;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
