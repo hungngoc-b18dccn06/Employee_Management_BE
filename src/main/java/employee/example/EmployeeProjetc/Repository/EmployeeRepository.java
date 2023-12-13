@@ -19,4 +19,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Query("SELECT e FROM Employee e WHERE e.role IN ?1 AND (e.employeeid LIKE %?2%  OR e.employeename LIKE %?2% OR e.email LIKE %?2% OR e.phone LIKE %?2%)")
     Page<Employee> findByRoleAndEmployeenameContaining(List<Integer> roles, String search, Pageable pageable);
 
+
 }

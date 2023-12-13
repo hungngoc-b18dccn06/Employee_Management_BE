@@ -1,6 +1,7 @@
 package employee.example.EmployeeProjetc.Service;
 
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
+import employee.example.EmployeeProjetc.DTO.RegisterEmployeeRequest;
 import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.Entity.GlobalExceptionHandler;
 import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
@@ -19,6 +20,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,17 +30,15 @@ import java.util.regex.Pattern;
 public class EmployeeServiceImpl implements EmployeeService{
     private final EmployeeRepository employeeRepository;
     private final GlobalExceptionHandler globalExceptionHandler;
-    @Autowired
     public EmployeeServiceImpl(EmployeeRepository employeeRepository, GlobalExceptionHandler globalExceptionHandler){
         this.employeeRepository = employeeRepository;
         this.globalExceptionHandler = globalExceptionHandler;
     }
-    @Autowired
-    private HttpServletRequest httpServletRequest;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Override
-    public ResponseEntity<Map<String, Object>> registerEmployee(Employee employee) {
+    public ResponseEntity<Map<String, Object>> registerEmployee(RegisterEmployeeRequest employee) throws ParseException {
         if (employeeRepository.existsById(Integer.valueOf(employee.getEmployeeid()))) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Employee with this ID already exists");
         }
@@ -48,15 +49,13 @@ public class EmployeeServiceImpl implements EmployeeService{
         if (existingEmployee != null) {
             return  globalExceptionHandler.buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Email already exists");
         }
-        Employee newEmployee = new Employee(
-                employee.getId(),
-                employee.getEmployeeid(),
-                employee.getEmployeename(),
-                employee.getEmail(),
-                employee.getPhone(),
-                passwordEncoder.encode(employee.getPassword()),
-                employee.getRole()
-        );
+        Employee newEmployee = Employee.builder()
+                        .status(0)
+                        .employeeid(employee.getEmployeeid())
+                        .employeename(employee.getEmployeename())
+                                .email(employee.getEmail())
+                                        .phone(employee.getPhone())
+                .password(passwordEncoder.encode(employee.getPassword())).build();
         employeeRepository.save(newEmployee);
         return ResponseEntity.ok().body( globalExceptionHandler.buildSuccessResponse("Employee registered successfully: " + newEmployee.getEmployeename()).getBody());
     }
