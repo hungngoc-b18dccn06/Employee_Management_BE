@@ -1,10 +1,11 @@
-package employee.example.EmployeeProjetc.Service;
+package employee.example.EmployeeProjetc.Service.Impl;
 
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
 import employee.example.EmployeeProjetc.DTO.RegisterEmployeeRequest;
 import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.Entity.GlobalExceptionHandler;
 import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
+import employee.example.EmployeeProjetc.Service.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,7 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class EmployeeServiceImpl implements EmployeeService{
+public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final GlobalExceptionHandler globalExceptionHandler;
     public EmployeeServiceImpl(EmployeeRepository employeeRepository, GlobalExceptionHandler globalExceptionHandler){

@@ -1,4 +1,4 @@
-package employee.example.EmployeeProjetc.EmployeeController;
+package employee.example.EmployeeProjetc.Controller;
 
 
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
@@ -17,7 +17,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @RestController
