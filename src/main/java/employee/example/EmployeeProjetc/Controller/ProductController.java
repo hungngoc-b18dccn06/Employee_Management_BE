@@ -26,7 +26,7 @@ public class ProductController {
                                                        @RequestPart ("category") String category,
                                                        @RequestPart ("average_rating") String average_rating,
                                                        @RequestPart ("file") MultipartFile file){
-        ProductDTO productDTO = new ProductDTO(productName,code,price, average_rating, category, status );
+        ProductDTO productDTO = new ProductDTO(productName,null,price, average_rating, category, status );
          String result = productService.addProductWithImage(productDTO, file);
          if(result == null || result.trim().isEmpty()){
              ResponseEntity.badRequest().body("Product registration failed") ;

@@ -23,21 +23,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 
 @Service
 public class ProductServiceImpl implements ProductService {
-
     private final ProductRepository productRepository;
-
-
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
-
     @Override
     public Page<Product> getAllProduct(Pageable pageable) {
         return productRepository.findAll(pageable);
@@ -59,7 +58,10 @@ public class ProductServiceImpl implements ProductService {
                     Path imagePath = Paths.get("src/main/resources/images/" + imageFileName);
                     Files.copy(new ByteArrayInputStream((imageBytes)), imagePath, StandardCopyOption.REPLACE_EXISTING);
 
+                    String productCode = generateUniqueProductCode();
+                    productDTO.setCode(productCode);
                     Product product = new Product();
+
                     product.setProductName(productDTO.getProductName());
                     product.setProductCode(productDTO.getCode());
                     product.setCategory(productDTO.getCategory());
@@ -75,5 +77,20 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         return "";
+    }
+
+    public String generateUniqueProductCode() {
+        Set<String> usedCodes = new HashSet<>();
+        Random random = new Random();
+
+        while (true) {
+            int code = random.nextInt(900000) + 100000;
+            String productCode = String.valueOf(code);
+
+            if (!usedCodes.contains(productCode)) {
+                usedCodes.add(productCode);
+                return productCode;
+            }
+        }
     }
 }

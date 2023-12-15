@@ -39,14 +39,6 @@ public class EmployeeController {
             return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody().get("error_message").toString());
         }
     }
-
-//    @GetMapping(path = "/list")
-//    public Page<Employee> getAllEmployees(@RequestParam(defaultValue = "1") int page,
-//                                          @RequestParam(defaultValue = "10") int size) {
-//        PageRequest pageRequest = PageRequest.of(page - 1, size);
-//        return employeeService.getAllEmployees(pageRequest);
-//    }
-
     @PostMapping(path = "/list")
     public Page<SearchEmployeeOutputDto> searchAllEmployees(@RequestBody FilterValue filterValue) {
         PageRequest pageRequest = PageRequest.of(filterValue.getPageIndex(), filterValue.getPageSize());
