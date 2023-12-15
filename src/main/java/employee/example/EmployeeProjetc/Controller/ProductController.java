@@ -24,10 +24,10 @@ public class ProductController {
                                                        @RequestPart ("price") String price,
                                                        @RequestPart ("code") String code,
                                                        @RequestPart ("status") String status,
-                                                       @RequestPart ("price") String category,
-                                                       @RequestPart ("price") String review,
+                                                       @RequestPart ("category") String category,
+                                                       @RequestPart ("average_rating ") String average_rating ,
                                                        @RequestPart ("file") MultipartFile file){
-        ProductDTO productDTO = new ProductDTO(productName,code,price, review, category, status );
+        ProductDTO productDTO = new ProductDTO(productName,code,price, average_rating , category, status );
          String result = productService.addProductWithImage(productDTO, file);
          if(result == null || result.trim().isEmpty()){
              ResponseEntity.badRequest().body("Product registration failed") ;
