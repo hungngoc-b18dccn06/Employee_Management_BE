@@ -30,7 +30,7 @@ public class Product {
     @Column(name="category")
     private String category;
 
-    @Column(name="average_rating ")
+    @Column(name="average_rating")
     private int average_rating ;
 
     @Column(name="status")
