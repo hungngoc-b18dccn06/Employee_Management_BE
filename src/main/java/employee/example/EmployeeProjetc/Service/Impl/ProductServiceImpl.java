@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<Product> getAllProduct(Pageable pageable) {
-        return null;
+        return productRepository.findAll(pageable);
     }
 
     @Transactional
@@ -63,11 +63,10 @@ public class ProductServiceImpl implements ProductService {
                     product.setProductName(productDTO.getProductName());
                     product.setProductCode(productDTO.getCode());
                     product.setCategory(productDTO.getCategory());
-                    product.setReview(Integer.parseInt(productDTO.getReview()));
+                    product.setAverage_rating(Integer.parseInt(productDTO.getAverage_rating()));
                     product.setStatus(String.valueOf(productDTO.getStatus()));
                     product.setPrice(productDTO.getPrice());
                     product.setProductImage("src/main/resources/images/" + imageFileName);
-
                     Product savedProduct = productRepository.save(product);
                     return savedProduct.getProductImage();
                 }
