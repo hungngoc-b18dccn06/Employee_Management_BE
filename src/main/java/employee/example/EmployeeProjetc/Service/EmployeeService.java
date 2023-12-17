@@ -22,7 +22,7 @@ public interface EmployeeService {
 
     ResponseEntity<String> loginEmployee(Employee employee);
 
-    public ResponseEntity<String> updateEmployee(int id, Employee updatedEmployee);
+    public ResponseEntity<String> updateEmployee(int id, Employee employee);
 
     public ResponseEntity<Employee> getEmployeeDetail(int id);
 

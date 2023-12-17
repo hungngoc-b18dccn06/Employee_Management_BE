@@ -16,13 +16,15 @@ public class EmployeeDTO {
     private String email;
     private String phone;
     private int role;
+    private int status;
 
-    public EmployeeDTO(String employeeid, String employeename, String email, String phone, int role) {
+    public EmployeeDTO(String employeeid, String employeename, String email, String phone, int role, int status) {
         this.employeeid = employeeid;
         this.employeename = employeename;
         this.email = email;
         this.phone = phone;
         this.role = role;
+        this.status = status;
     }
     public EmployeeDTO(Employee employee) {
         this.employeeid = String.valueOf(employee.getEmployeeid());
@@ -30,5 +32,6 @@ public class EmployeeDTO {
         this.employeename = employee.getEmployeename();
         this.phone = employee.getPhone();
         this.role = employee.getRole();
+        this.status = employee.getStatus();
     }
 }
