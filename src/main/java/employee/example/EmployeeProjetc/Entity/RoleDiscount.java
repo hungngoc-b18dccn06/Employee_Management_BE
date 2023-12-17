@@ -18,8 +18,10 @@ public class RoleDiscount {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @Column(name = "role", unique = true)
+
+    @Column(name = "role")
     private String role;
+
 
     @Column(name = "discount", precision = 5, scale = 2)
     private Integer discount;

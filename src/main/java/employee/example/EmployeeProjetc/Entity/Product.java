@@ -38,4 +38,10 @@ public class Product {
 
     @Column(name="price")
     private String price;
+
+    @Column(name="quantity")
+    private String quantity;
+
+    @Column(name="description")
+    private String description;
 }
