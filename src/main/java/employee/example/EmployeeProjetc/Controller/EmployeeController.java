@@ -7,17 +7,23 @@ import employee.example.EmployeeProjetc.DTO.RegisterEmployeeRequest;
 import employee.example.EmployeeProjetc.DTO.SearchEmployeeOutputDto;
 import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.Service.EmployeeService;
+import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +45,11 @@ public class EmployeeController {
             return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody().get("error_message").toString());
         }
     }
+
     @PostMapping(path = "/list")
     public Page<SearchEmployeeOutputDto> searchAllEmployees(@RequestBody FilterValue filterValue) {
         PageRequest pageRequest = PageRequest.of(filterValue.getPageIndex(), filterValue.getPageSize());
-        Integer role = (Integer) filterValue.getFilterValue().get("role");
-        Integer status = (Integer) filterValue.getFilterValue().get("status");
-        String searchText = (String) filterValue.getFilterValue().get("search_text");
-        String startDate = (String) filterValue.getFilterValue().get("startDate");
-        String endDate = (String) filterValue.getFilterValue().get("endDate");
-        List<SearchEmployeeOutputDto> rs = employeeService.searchEmployees(pageRequest, role, searchText, status, startDate, endDate);
+        List<SearchEmployeeOutputDto> rs = employeeService.searchEmployees(pageRequest, filterValue);
         return new PageImpl<SearchEmployeeOutputDto>(rs, pageRequest, rs.size());
     }
 
@@ -86,4 +88,48 @@ public class EmployeeController {
         ResponseEntity<String> responseEntity = employeeService.deleteEmployee(id);
         return responseEntity;
     }
+
+    @PostMapping("/export-excel")
+    public ResponseEntity<byte[]> exportEmployeeToExcel(@RequestBody FilterValue filterValue) {
+        try {
+            Workbook workbook = employeeService.exportEmployeeToExcel(filterValue);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            byte[] excelBytes = outputStream.toByteArray();
+            outputStream.close();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", "employees.xlsx");
+
+            return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting data to Excel".getBytes());
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/export-csv")
+    public ResponseEntity<byte[]> exportEmployeeToCsv(@RequestBody FilterValue filterValue) {
+        try {
+            String csvData = employeeService.exportEmployeeToCsv(filterValue);
+            byte[] csvBytes = csvData.getBytes();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("text/csv"));
+            headers.setContentDispositionFormData("attachment", "employees.csv");
+
+            return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error exporting data to CSV".getBytes());
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

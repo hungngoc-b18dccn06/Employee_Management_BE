@@ -1,7 +1,9 @@
 package employee.example.EmployeeProjetc.Service.Impl;
 
 import com.mysql.cj.util.StringUtils;
+import com.opencsv.CSVWriter;
 import employee.example.EmployeeProjetc.DTO.EmployeeDTO;
+import employee.example.EmployeeProjetc.DTO.FilterValue;
 import employee.example.EmployeeProjetc.DTO.RegisterEmployeeRequest;
 import employee.example.EmployeeProjetc.DTO.SearchEmployeeOutputDto;
 import employee.example.EmployeeProjetc.Entity.Employee;
@@ -12,8 +14,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.StringWriter;
 import java.security.Key;
 import java.text.ParseException;
 import java.util.*;
@@ -35,6 +43,8 @@ import java.util.regex.Pattern;
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final GlobalExceptionHandler globalExceptionHandler;
+
+    private final Integer MAX_SIZE_EXCEL = 10000;
 
     public EmployeeServiceImpl(EmployeeRepository employeeRepository, GlobalExceptionHandler globalExceptionHandler) {
         this.employeeRepository = employeeRepository;
@@ -61,6 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Employee newEmployee = Employee.builder()
                 .status(0)
+                .role(1)
                 .employeeid(employee.getEmployeeid())
                 .employeename(employee.getEmployeename())
                 .email(employee.getEmail())
@@ -85,28 +96,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Page<Employee> getAllEmployees(Pageable pageable) {
         return employeeRepository.findAll(pageable);
     }
-//    @Override
-//    public Page<Employee> searchEmployees(Pageable pageable, Integer role, String searchText, Integer status) {
-//        List<Integer> roles = new ArrayList<>();
-//        if (role == null) {
-//            roles.add(1);
-//            roles.add(2);
-//        } else {
-//            roles.add(role);
-//        }
-//        if (StringUtils.isNullOrEmpty(searchText)) {
-//            searchText = "";
-//        } else {
-//            searchText = "%" + searchText + "%";
-//        }
-//
-//
-//        return employeeRepository.findByRoleAndEmployeenameContainingAndStatus(1, searchText, pageable);
-//
-//    }
 
     @Override
-    public List<SearchEmployeeOutputDto> searchEmployees(Pageable pageable, Integer role, String searchText, Integer status, String startDate, String endDate) {
+    public List<SearchEmployeeOutputDto> searchEmployees(Pageable pageable, FilterValue filterValue) {
+        Integer role = (Integer) filterValue.getFilterValue().get("role");
+        Integer status = (Integer) filterValue.getFilterValue().get("status");
+        String searchText = (String) filterValue.getFilterValue().get("search_text");
+        String startDate = (String) filterValue.getFilterValue().get("startDate");
+        String endDate = (String) filterValue.getFilterValue().get("endDate");
         List<Integer> roles = new ArrayList<>();
         if (role == null) {
             roles.add(1);
@@ -140,15 +137,15 @@ public class EmployeeServiceImpl implements EmployeeService {
             query.append("AND e.status = :status ");
             input.put("status", status);
         }
-        if (StringUtils.isNullOrEmpty(searchText) && !searchText.trim().equals("")) {
+        if (!StringUtils.isNullOrEmpty(searchText)) {
             query.append("AND (e.phone like :searchText OR e.email like :searchText OR e.employee_id like :searchText )");
-            input.put("searchText", "%" + searchText + "%");
+            input.put("searchText", searchText);
         }
-        if(startDate != null && !startDate.trim().equals("")){
+        if (startDate != null && !startDate.trim().equals("")) {
             query.append("AND e.created_at >= :startDate ");
             input.put("startDate", startDate);
         }
-        if(endDate != null && !endDate.trim().equals("")){
+        if (endDate != null && !endDate.trim().equals("")) {
             query.append("AND e.created_at <= :endDate ");
             input.put("endDate", endDate);
         }
@@ -240,5 +237,62 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.deleteById(id);
 
         return ResponseEntity.ok("Employee deleted successfully");
+    }
+
+    @Override
+    public Workbook exportEmployeeToExcel(FilterValue filterValue) throws IOException {
+
+        List<SearchEmployeeOutputDto> employees = searchEmployees(Pageable.ofSize(MAX_SIZE_EXCEL), filterValue);
+        Workbook workbook = new XSSFWorkbook();
+
+        Sheet sheet = workbook.createSheet("Employee Data");
+
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Employee ID");
+        headerRow.createCell(1).setCellValue("Employee Name");
+        headerRow.createCell(2).setCellValue("Email");
+        headerRow.createCell(3).setCellValue("Phone");
+        headerRow.createCell(4).setCellValue("Role");
+        headerRow.createCell(5).setCellValue("Status");
+
+        int rowNum = 1;
+        for (SearchEmployeeOutputDto employee : employees) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(employee.getEmployeeid());
+            row.createCell(1).setCellValue(employee.getEmployeename());
+            row.createCell(2).setCellValue(employee.getEmail());
+            row.createCell(3).setCellValue(employee.getPhone());
+            row.createCell(4).setCellValue(employee.getRole());
+            row.createCell(5).setCellValue(employee.getStatus());
+        }
+
+        return workbook;
+    }
+
+    @Override
+    public String exportEmployeeToCsv(FilterValue filterValue) throws IOException {
+        List<SearchEmployeeOutputDto> employees = searchEmployees(Pageable.ofSize(MAX_SIZE_EXCEL), filterValue);
+
+        StringWriter writer = new StringWriter();
+        try (CSVWriter csvWriter = new CSVWriter(writer)) {
+            // Write CSV header
+            csvWriter.writeNext(new String[]{"Employee ID", "Employee Name", "Email", "Phone", "Role", "Status"});
+
+            // Write CSV data
+            for (SearchEmployeeOutputDto employee : employees) {
+                csvWriter.writeNext(new String[]{
+                        String.valueOf(employee.getEmployeeid()),
+                        employee.getEmployeename(),
+                        employee.getEmail(),
+                        employee.getPhone(),
+                        String.valueOf(employee.getRole()),
+                        String.valueOf(employee.getStatus())
+                });
+            }
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return writer.toString();
     }
 }
