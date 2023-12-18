@@ -85,6 +85,21 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.11.0</version> <!-- Chỉ định phiên bản phù hợp -->
 		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.0.0</version> <!-- Phiên bản có thể thay đổi -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.0.0</version> <!-- Phiên bản có thể thay đổi -->
+		</dependency>
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.6</version> <!-- Use the latest version available -->
+		</dependency>
 
 
 	</dependencies>
