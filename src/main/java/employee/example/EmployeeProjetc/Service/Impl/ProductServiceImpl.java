@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +42,8 @@ public class ProductServiceImpl implements ProductService {
     public Page<Product> getAllProduct(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
+
+
 
     @Transactional
     @Override
@@ -89,6 +93,15 @@ public class ProductServiceImpl implements ProductService {
         } catch (IOException e) {
             throw new RuntimeException("Error retrieving image: " + e.getMessage());
         }
+    }
+    @Override
+    public ResponseEntity<String> deleteProduct(int id) {
+        if (!productRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+        }
+        productRepository.deleteById(id);
+
+        return ResponseEntity.ok("Product deleted successfully");
     }
 
     public String generateUniqueProductCode() {
