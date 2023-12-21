@@ -15,4 +15,6 @@ public interface ProductService {
     String addProductWithImage(ProductDTO productDTO, MultipartFile file);
 
     Resource getProductImageResource(String imageFileName);
+
+    ResponseEntity<String> deleteProduct(int id);
 }

@@ -53,6 +53,11 @@ public class ProductController {
         return productService.getAllProduct(pageRequest);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable int id) {
+        ResponseEntity<String> responseEntity = productService.deleteProduct(id);
+        return responseEntity;
+    }
 
     @GetMapping("/images/{imageFileName:.+}")
     public ResponseEntity<Resource> getProductImage(@PathVariable String imageFileName) throws IOException {
@@ -69,5 +74,6 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
 }
