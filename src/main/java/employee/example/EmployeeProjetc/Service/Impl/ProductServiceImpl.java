@@ -2,6 +2,7 @@ package employee.example.EmployeeProjetc.Service.Impl;
 
 import employee.example.EmployeeProjetc.DTO.ProductDTO;
 import employee.example.EmployeeProjetc.Entity.Product;
+import employee.example.EmployeeProjetc.Repository.CartItemProductRepository;
 import employee.example.EmployeeProjetc.Repository.ProductRepository;
 import employee.example.EmployeeProjetc.Service.ProductService;
 import org.springframework.core.io.Resource;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,10 +33,12 @@ import java.util.UUID;
 @Service
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private  final CartItemProductRepository cartItemProductRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CartItemProductRepository cartItemProductRepository) {
         this.productRepository = productRepository;
+        this.cartItemProductRepository = cartItemProductRepository;
     }
     @Override
     public Page<Product> getAllProduct(Pageable pageable) {
@@ -94,15 +96,19 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Error retrieving image: " + e.getMessage());
         }
     }
+
     @Override
     public ResponseEntity<String> deleteProduct(int id) {
         if (!productRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
         }
+        cartItemProductRepository.deleteByProductId(id);
+
         productRepository.deleteById(id);
 
         return ResponseEntity.ok("Product deleted successfully");
     }
+
 
     public String generateUniqueProductCode() {
         Set<String> usedCodes = new HashSet<>();

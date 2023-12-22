@@ -1,9 +1,6 @@
 package employee.example.EmployeeProjetc.Service.Impl;
 
-import employee.example.EmployeeProjetc.Entity.CartItem;
-import employee.example.EmployeeProjetc.Entity.CartItemProduct;
-import employee.example.EmployeeProjetc.Entity.Employee;
-import employee.example.EmployeeProjetc.Entity.Product;
+import employee.example.EmployeeProjetc.Entity.*;
 import employee.example.EmployeeProjetc.Repository.CartItemProductRepository;
 import employee.example.EmployeeProjetc.Repository.CartItemRepository;
 import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
@@ -13,12 +10,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CartItemServiceImpl implements CartItemService {
+
     private final EmployeeRepository employeeRepository;
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
@@ -46,6 +43,7 @@ public class CartItemServiceImpl implements CartItemService {
             if (employeeOptional.isPresent() && productOptional.isPresent()) {
                 Employee employee = employeeOptional.get();
                 Product product = productOptional.get();
+
                 // CART ITEM
                 CartItem checkExistedCart = cartItemRepository.findCartItemByStatusAndEmployee(0, employee);
                 Set<Product> products = new HashSet<>();
@@ -77,4 +75,50 @@ public class CartItemServiceImpl implements CartItemService {
         }
     }
 
+    @Override
+    public List<Map<String, Object>> getAllCart() {
+        try {
+            List<Map<String, Object>> cartItemProducts = cartItemProductRepository.findAllWithDetails();
+            List<Map<String, Object>> result = new ArrayList<>();
+
+            List<Integer> cartItemIds = cartItemProducts.stream()
+                    .map(cp -> (Integer) cp.get("cartItemId"))
+                    .collect(Collectors.toList());
+            List<Integer> productIds = cartItemProducts.stream()
+                    .map(cp -> (Integer) cp.get("productId"))
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> employeeDetails = cartItemProductRepository.findEmployeeDetailsByCartItems(cartItemIds);
+            List<Map<String, Object>> productDetails = cartItemProductRepository.findProductDetailsByIds(productIds);
+
+            for (Map<String, Object> cartItemProduct : cartItemProducts) {
+                Map<String, Object> itemDetails = new HashMap<>();
+
+                itemDetails.putAll(cartItemProduct);
+                itemDetails.putAll(employeeDetails.stream()
+                        .filter(e -> Objects.equals(e.get("cartItemId"), cartItemProduct.get("cartItemId")))
+                        .findFirst().orElse(Collections.emptyMap()));
+                itemDetails.putAll(productDetails.stream()
+                        .filter(p -> Objects.equals(p.get("productId"), cartItemProduct.get("productId")))
+                        .findFirst().orElse(Collections.emptyMap()));
+
+                result.add(itemDetails);
+            }
+
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving all cart items: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteCartItemProductByProductId(Long productId) {
+        try {
+            cartItemProductRepository.deleteByProductId(Math.toIntExact(productId));
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting cart item product by product ID: " + e.getMessage());
+        }
+    }
 }

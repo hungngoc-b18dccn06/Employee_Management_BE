@@ -16,13 +16,17 @@ import java.util.Date;
 @Table(name = "orders")
 public class Order {
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY) // Sử dụng GenerationType.IDENTITY cho ID tự tăng
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "id", nullable = false, unique = true)
         private int id;
 
         @ManyToOne
         @JoinColumn(name = "employee_id", referencedColumnName = "employee_id")
         private Employee employee;
+
+        @ManyToOne
+        @JoinColumn(name = "cart_item_id")
+        private CartItem cartItem;
 
         @ManyToOne
         @JoinColumn(name = "product_id")
