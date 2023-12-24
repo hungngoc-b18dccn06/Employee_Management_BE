@@ -11,19 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "RoleDiscount")
+@Table(name = "role_discount")
 public class RoleDiscount {
     @Id
     @Column(name="id", length = 45)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-
-    @Column(name = "role")
+    @Column(name = "role", unique = true, nullable = false)
     private String role;
-
 
     @Column(name = "discount", precision = 5, scale = 2)
     private Integer discount;
-
 }

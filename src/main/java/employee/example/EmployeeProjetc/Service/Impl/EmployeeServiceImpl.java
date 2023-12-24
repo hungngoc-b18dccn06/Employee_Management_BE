@@ -108,6 +108,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (role == null) {
             roles.add(1);
             roles.add(2);
+            roles.add(3);
         } else {
             roles.add(role);
         }
