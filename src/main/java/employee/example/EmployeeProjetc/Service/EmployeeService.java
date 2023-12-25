@@ -29,6 +29,8 @@ public interface EmployeeService {
 
     public ResponseEntity<Employee> getEmployeeDetail(int id);
 
+    ResponseEntity<String> updateEmployeeProfile(String jwtToken, EmployeeDTO updatedEmployeeDTO);
+
     public ResponseEntity<String> deleteEmployee(int id);
 
     public ResponseEntity<EmployeeDTO> getCurrentEmployee(HttpServletRequest request);

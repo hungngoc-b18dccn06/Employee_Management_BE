@@ -1,6 +1,6 @@
 package employee.example.EmployeeProjetc.Service;
 
-import employee.example.EmployeeProjetc.Entity.CartItem;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -13,6 +13,6 @@ public interface CartItemService {
     List<Map<String, Object>> getAllCart();
 
     @Transactional
-    void deleteCartItemProductByProductId(Long productId);
+    ResponseEntity<String> deleteCartItemProductByProductId(Integer productId);
 
 }

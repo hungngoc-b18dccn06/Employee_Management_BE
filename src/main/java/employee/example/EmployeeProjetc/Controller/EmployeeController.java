@@ -130,6 +130,15 @@ public class EmployeeController {
             throw new RuntimeException(e);
         }
     }
+    @PutMapping("/update-profile")
+    public ResponseEntity<String> updateEmployeeProfile(HttpServletRequest request, @RequestBody EmployeeDTO updatedEmployeeDTO) {
+        String authorizationHeader = request.getHeader("Authorization");
 
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return employeeService.updateEmployeeProfile(authorizationHeader.substring(7), updatedEmployeeDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+    }
 
 }
