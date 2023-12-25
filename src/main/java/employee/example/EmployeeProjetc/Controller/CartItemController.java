@@ -1,7 +1,9 @@
 package employee.example.EmployeeProjetc.Controller;
 
-import employee.example.EmployeeProjetc.Entity.CartItemProduct;
+import employee.example.EmployeeProjetc.DTO.OrderDTO;
+import employee.example.EmployeeProjetc.Entity.Order;
 import employee.example.EmployeeProjetc.Service.CartItemService;
+import employee.example.EmployeeProjetc.Service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,12 @@ import java.util.Map;
 public class CartItemController {
 
     private final CartItemService cartItemService;
+    private OrderService orderService;
 
     @Autowired
-    public CartItemController(CartItemService cartItemService) {
+    public CartItemController(CartItemService cartItemService, OrderService orderService) {
         this.cartItemService = cartItemService;
+        this.orderService = orderService;
     }
 
     @PostMapping("/add")
@@ -54,5 +58,15 @@ public class CartItemController {
     public ResponseEntity<String> deleteEmployee(@PathVariable Integer id) {
         ResponseEntity<String> responseEntity = cartItemService.deleteCartItemProductByProductId(Integer.valueOf(id));
         return ResponseEntity.ok("The product has been removed from your shopping cart.");
+    }
+
+    @PostMapping("/purchaseOrder")
+    public ResponseEntity<String> purchaseOrder(@RequestBody OrderDTO order) {
+        try {
+            String s = orderService.purchaseOrder(order);
+            return ResponseEntity.ok(s);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error purchase order: " + e.getMessage());
+        }
     }
 }

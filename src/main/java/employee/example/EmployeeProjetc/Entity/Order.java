@@ -28,16 +28,24 @@ public class Order {
         @JoinColumn(name = "cart_item_id")
         private CartItem cartItem;
 
-        @ManyToOne
-        @JoinColumn(name = "product_id")
-        private Product product;
-
         @Column(name = "order_date")
         private Date orderDate;
 
-        @Column(name = "quantity")
-        private int quantity;
-
         @Column(name = "total_price", precision = 10, scale = 2)
         private String totalPrice;
+
+
+        @Column(name = "method_payment")
+        private String methodPayment;
+
+
+        @Column(name = "address")
+        private String address;
+
+
+        @Column(name = "order_status")
+        private Integer orderStatus;
+
+
+
 }
