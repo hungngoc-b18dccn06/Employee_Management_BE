@@ -49,4 +49,10 @@ public class CartItemController {
                     .body(Collections.singletonList(errorResponse));
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable Integer id) {
+        ResponseEntity<String> responseEntity = cartItemService.deleteCartItemProductByProductId(Integer.valueOf(id));
+        return ResponseEntity.ok("The product has been removed from your shopping cart.");
+    }
 }

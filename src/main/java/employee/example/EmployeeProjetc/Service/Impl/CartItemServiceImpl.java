@@ -8,6 +8,7 @@ import employee.example.EmployeeProjetc.Repository.ProductRepository;
 import employee.example.EmployeeProjetc.Service.CartItemService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -114,11 +115,12 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     @Transactional
-    public void deleteCartItemProductByProductId(Long productId) {
+    public ResponseEntity<String> deleteCartItemProductByProductId(Integer productId) {
         try {
             cartItemProductRepository.deleteByProductId(Math.toIntExact(productId));
         } catch (Exception e) {
             throw new RuntimeException("Error deleting cart item product by product ID: " + e.getMessage());
         }
+        return null;
     }
 }

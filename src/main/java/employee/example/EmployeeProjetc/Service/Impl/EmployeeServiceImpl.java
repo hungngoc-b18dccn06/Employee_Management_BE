@@ -229,6 +229,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    @Override
+    public ResponseEntity<String> updateEmployeeProfile(String jwtToken, EmployeeDTO updatedEmployeeDTO) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSignInKey(JWT_SECRET))
+                    .build()
+                    .parseClaimsJws(jwtToken)
+                    .getBody();
+            String email = claims.getSubject();
+            Employee existingEmployee = employeeRepository.findByEmail(email);
+
+            if (existingEmployee != null) {
+                if ((existingEmployee.getRole() == 1) || (existingEmployee.getRole() == 2)) {
+                    existingEmployee.setEmployeename(updatedEmployeeDTO.getEmployeename());
+                    existingEmployee.setEmployeeid(updatedEmployeeDTO.getEmployeeid());
+                    existingEmployee.setPhone(updatedEmployeeDTO.getPhone());
+                    existingEmployee.setEmail(updatedEmployeeDTO.getEmail());
+                } else if (existingEmployee.getRole() == 3) {
+                    existingEmployee.setEmployeename(updatedEmployeeDTO.getEmployeename());
+                    existingEmployee.setPhone(updatedEmployeeDTO.getPhone());
+                    existingEmployee.setEmail(updatedEmployeeDTO.getEmail());
+                    existingEmployee.setRole(updatedEmployeeDTO.getRole());
+                    existingEmployee.setStatus(updatedEmployeeDTO.getStatus());
+                }
+                employeeRepository.save(existingEmployee);
+
+                return ResponseEntity.ok("Profile updated successfully");
+            } else {
+                // Trường hợp không tìm thấy nhân viên
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating profile");
+        }
+    }
+
 
     @Override
     public ResponseEntity<String> deleteEmployee(int id) {
