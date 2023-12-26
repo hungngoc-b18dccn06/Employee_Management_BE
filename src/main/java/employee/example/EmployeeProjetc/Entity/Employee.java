@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -50,4 +51,7 @@ public class Employee {
     public void createAt() {
         createdAt = new Date();
     }
+
+    @OneToMany(mappedBy = "employee")
+    private List<Order> orders;
 }

@@ -3,9 +3,11 @@ package employee.example.EmployeeProjetc.Service.Impl;
 import employee.example.EmployeeProjetc.DTO.OrderDTO;
 import employee.example.EmployeeProjetc.Entity.CartItem;
 import employee.example.EmployeeProjetc.Entity.CartItemProduct;
+import employee.example.EmployeeProjetc.Entity.Employee;
 import employee.example.EmployeeProjetc.Entity.Order;
 import employee.example.EmployeeProjetc.Repository.CartItemProductRepository;
 import employee.example.EmployeeProjetc.Repository.CartItemRepository;
+import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
 import employee.example.EmployeeProjetc.Repository.OrderRepository;
 import employee.example.EmployeeProjetc.Service.OrderService;
 import jakarta.transaction.Transactional;
@@ -25,11 +27,16 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
 
     @Override
     @Transactional
     public String purchaseOrder(OrderDTO order) {
         Optional<CartItem> cartItem = cartItemRepository.findById(order.getCartItemId());
+        Optional<Employee> employee = employeeRepository.findEmployeeByEmployeeId(String.valueOf(order.getEmployeeId()));
+
         if (cartItem.isEmpty()) {
             return "Error purchase order";
         }
@@ -46,7 +53,9 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setOrderDate(order.getOrderDate());
         newOrder.setAddress(order.getAddress());
         newOrder.setTotalPrice(order.getTotalPrice());
+        newOrder.setMethodPayment(order.getMethodPayment());
         newOrder.setCartItem(cartItem.get());
+        newOrder.setEmployee(employee.get());
         newOrder = orderRepository.save(newOrder);
         cartItem.get().setStatus(1);
         cartItemRepository.save(cartItem.get());
