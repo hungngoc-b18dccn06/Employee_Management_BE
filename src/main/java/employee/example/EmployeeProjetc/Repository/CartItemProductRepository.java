@@ -1,8 +1,6 @@
 package employee.example.EmployeeProjetc.Repository;
 
-import employee.example.EmployeeProjetc.Entity.CartItem;
 import employee.example.EmployeeProjetc.Entity.CartItemProduct;
-import employee.example.EmployeeProjetc.Entity.Product;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,12 +14,15 @@ import java.util.Map;
 @Repository
 public interface CartItemProductRepository extends JpaRepository<CartItemProduct, Integer> {
     CartItemProduct findCartItemProductByCartItemIdAndProductId(int a, int b);
+
+    List<CartItemProduct> findCartItemProductByCartItemId(int a);
+
     @Query("SELECT new map(cp.id as cartItemProductId, cp.quantity as quantity, " +
             "cp.cartItemId as cartItemId, cp.productId as productId) " +
             "FROM CartItemProduct cp")
     List<Map<String, Object>> findAllWithDetails();
 
-    @Query("SELECT new map(c.id as cartItemId, c.employee.id as employeeId) " +
+    @Query("SELECT new map(c.id as cartItemId, c.employee.id as employeeId, c.status as status) " +
             "FROM CartItem c WHERE c.id IN :cartItemIds")
     List<Map<String, Object>> findEmployeeDetailsByCartItems(@Param("cartItemIds") List<Integer> cartItemIds);
 
