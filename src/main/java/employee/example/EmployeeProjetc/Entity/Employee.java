@@ -1,5 +1,6 @@
 package employee.example.EmployeeProjetc.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,7 +52,7 @@ public class Employee {
     public void createAt() {
         createdAt = new Date();
     }
-
+    @JsonIgnore
     @OneToMany(mappedBy = "employee")
     private List<Order> orders;
 }

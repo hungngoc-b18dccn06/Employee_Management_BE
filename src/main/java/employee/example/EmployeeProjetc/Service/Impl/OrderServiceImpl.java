@@ -1,10 +1,7 @@
 package employee.example.EmployeeProjetc.Service.Impl;
 
 import employee.example.EmployeeProjetc.DTO.OrderDTO;
-import employee.example.EmployeeProjetc.Entity.CartItem;
-import employee.example.EmployeeProjetc.Entity.CartItemProduct;
-import employee.example.EmployeeProjetc.Entity.Employee;
-import employee.example.EmployeeProjetc.Entity.Order;
+import employee.example.EmployeeProjetc.Entity.*;
 import employee.example.EmployeeProjetc.Repository.CartItemProductRepository;
 import employee.example.EmployeeProjetc.Repository.CartItemRepository;
 import employee.example.EmployeeProjetc.Repository.EmployeeRepository;
@@ -60,5 +57,11 @@ public class OrderServiceImpl implements OrderService {
         cartItem.get().setStatus(1);
         cartItemRepository.save(cartItem.get());
         return "Order successfully " + newOrder.getId();
+    }
+
+    @Override
+    @Transactional
+    public List<Order> listOrders() {
+        return orderRepository.findAll();
     }
 }
