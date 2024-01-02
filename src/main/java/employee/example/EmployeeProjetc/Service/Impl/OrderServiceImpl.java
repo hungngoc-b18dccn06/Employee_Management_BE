@@ -64,4 +64,21 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> listOrders() {
         return orderRepository.findAll();
     }
+
+
+    @Override
+    @Transactional
+    public String updateOrderStatus(Integer orderId, int newStatus) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+        if (optionalOrder.isEmpty()) {
+            return "Order not found";
+        }
+
+        Order order = optionalOrder.get();
+        order.setOrderStatus(newStatus);
+        orderRepository.save(order);
+
+        return "Order status updated successfully";
+    }
 }

@@ -25,4 +25,10 @@ public class OrderController {
     public List<Order> listOrders(){
         return orderService.listOrders();
     }
+
+
+    @PutMapping(path = "/update-status/{orderId}/{newStatus}")
+    public String updateOrderStatus(@PathVariable Integer orderId, @PathVariable int newStatus) {
+        return orderService.updateOrderStatus(orderId, newStatus);
+    }
 }

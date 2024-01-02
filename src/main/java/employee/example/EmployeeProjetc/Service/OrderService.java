@@ -11,4 +11,7 @@ public interface OrderService {
     String purchaseOrder(OrderDTO order);
 
     List<Order> listOrders();
+
+    @Transactional
+    String updateOrderStatus(Integer orderId, int newStatus);
 }
