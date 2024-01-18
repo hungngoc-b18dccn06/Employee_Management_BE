@@ -22,7 +22,7 @@ public interface CartItemProductRepository extends JpaRepository<CartItemProduct
             "FROM CartItemProduct cp")
     List<Map<String, Object>> findAllWithDetails();
 
-    @Query("SELECT new map(c.id as cartItemId, c.employee.id as employeeId, c.status as status) " +
+    @Query("SELECT new map(c.id as cartItemId, c.employee.employeeid as employeeId, c.status as status) " +
             "FROM CartItem c WHERE c.id IN :cartItemIds")
     List<Map<String, Object>> findEmployeeDetailsByCartItems(@Param("cartItemIds") List<Integer> cartItemIds);
 

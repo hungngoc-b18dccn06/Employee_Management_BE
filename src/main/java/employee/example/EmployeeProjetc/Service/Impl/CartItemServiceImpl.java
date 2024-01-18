@@ -105,7 +105,6 @@ public class CartItemServiceImpl implements CartItemService {
 
                 result.add(itemDetails);
             }
-
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Error retrieving all cart items: " + e.getMessage());
